@@ -14,6 +14,7 @@ const commandLineArgs = require('command-line-args')
 const optionDefinitions = [
   { name: 'auth', type: Boolean },
   { name: 'download', type: Boolean},
+  { name: 'set', type: Boolean},
   { name: 'dest', type:String},
   { name: 'imagesize', type:String}
 ]
@@ -79,14 +80,12 @@ function auth(){
 
 
 
-function getCollections(path, size){
+function byCollections(path, size){
     let param = _.extend({
         method: "flickr.collections.getTree",
     }, flickrOptions)
 
-
-    let url = sign(param);
-    request.get(url, (err, resp, body) => {
+    request.get(sign(param), (err, resp, body) => {
         if (err) return;
         let collections = JSON.parse(body).collections.collection;
         if (!fs.existsSync(path)) fs.mkdirSync(path);
@@ -102,6 +101,27 @@ function getCollections(path, size){
                 // start to download photoset
                 photoset(s.id, setDir, size)
             })
+        })
+    })
+}
+
+
+function byPhotosets(path, size){
+    let param = _.extend({
+        method: "flickr.photosets.getList"
+    }, flickrOptions)
+
+    request.get(sign(param), (err, resp, body) => {
+        if (err) return;
+
+        let sets = JSON.parse(body).photosets.photoset;
+        if (!fs.existsSync(path)) fs.mkdirSync(path);
+
+        _.each(sets, s => {
+            let dir = `${path}/${s.title._content}`;
+            if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+            console.log("Set folder: "+dir)
+            photoset(s.id, dir, size)
         })
     })
 }
@@ -212,7 +232,7 @@ function sign(data, isAuth){
 }
 
 
-function download(dest, size){
+function download(dest, size, bySet){
     dest = dest || "./images";
     size = size || 'o';
     if (size.length != 1 || "stmo".indexOf(size) == -1){
@@ -233,7 +253,8 @@ function download(dest, size){
     _.merge(flickrOptions, token);
 
     // download
-    getCollections(dest, size);
+    if (bySet) byPhotosets(dest, size);
+    else byCollections(dest, size);
 }
 
 
@@ -241,7 +262,8 @@ if (options.auth){
     auth();
 }
 else if (options.download){
-    download(options.dest, options.imagesize);
+    download(options.dest, options.imagesize, options.set);
 }
 else{
+    console.log("Please use --auth or --download")
 }

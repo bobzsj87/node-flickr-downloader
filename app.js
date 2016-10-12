@@ -106,20 +106,28 @@ function getCollections(path, size){
     })
 }
 
-function photoset(photoset_id, path, size){
+function photoset(photoset_id, path, size, page){
     let s = `url_${size}`;
+    page = page || 1;
     let param = _.extend({
         method: "flickr.photosets.getPhotos",
         photoset_id,
-        extras: s
+        extras: s,
+        page
     }, flickrOptions)
 
-    let dataPath = path+"/data.json";
+    let dataPath = `${path}/data-${page}.json`;
     qSet.push({dataPath, param}, (err, list) => {
-        if (err){
+        if (err || !list.photoset){
             console.log(err);
             return;
         }
+
+        // if there are more pages
+        if (list.photoset.photo.total > page*500){
+            photoset(photoset_id, path, size, page+1);
+        }
+
         _.each(list.photoset.photo, p => {
             qPhoto.push({
                 src: p[s],

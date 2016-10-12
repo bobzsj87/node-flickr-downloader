@@ -124,7 +124,7 @@ function photoset(photoset_id, path, size, page){
         }
 
         // if there are more pages
-        if (list.photoset.photo.total > page*500){
+        if (list.photoset.pages > page){
             photoset(photoset_id, path, size, page+1);
         }
 

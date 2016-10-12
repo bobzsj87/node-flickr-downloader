@@ -1,0 +1,21 @@
+{
+  "name": "nodeflickrDownloader",
+  "version": "1.0.0",
+  "description": "A simple downloader to download all your flickr images",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": ">=6.2.0"
+  },
+  "dependencies": {
+    "async": "^2.0.1",
+    "command-line-args": "^3.0.1",
+    "flickrapi": "^0.6.0",
+    "lodash": "^4.16.4",
+    "request": "^2.75.0"
+  }
+}

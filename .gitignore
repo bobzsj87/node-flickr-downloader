@@ -1,0 +1,4 @@
+node_modules
+image/*
+token.json
+secrets.json

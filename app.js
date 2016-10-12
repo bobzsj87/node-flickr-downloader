@@ -129,10 +129,16 @@ function photoset(photoset_id, path, size, page){
         }
 
         _.each(list.photoset.photo, p => {
-            qPhoto.push({
-                src: p[s],
-                dest: path + '/' + _.last(p[s].split('/'))
-            })
+            if (p[s]){
+                qPhoto.push({
+                    src: p[s],
+                    dest: path + '/' + _.last(p[s].split('/'))
+                })
+            }
+            else{
+                console.log("wrong formatting data")
+                console.log(p)
+            }
         })
     })
 }

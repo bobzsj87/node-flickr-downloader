@@ -1,4 +1,4 @@
-var fs = require('fs');
+var fs = require('fs-extra');
 const crypto = require('crypto');
 const _ = require('lodash');
 const request = require('request');
@@ -88,18 +88,19 @@ function byCollections(path, size){
     request.get(sign(param), (err, resp, body) => {
         if (err) return;
         let collections = JSON.parse(body).collections.collection;
-        if (!fs.existsSync(path)) fs.mkdirSync(path);
 
         _.each(collections, c => {
             let dir = `${path}/${c.title}`;
-            if (!fs.existsSync(dir)) fs.mkdirSync(dir);
             _.each(c.set, s => {
                 let setDir = `${dir}/${s.title}`;
-                if (!fs.existsSync(setDir)) fs.mkdirSync(setDir);
-                console.log("Set folder: "+setDir)
 
-                // start to download photoset
-                photoset(s.id, setDir, size)
+                fs.mkdirs(setDir, err => {
+                    if (err) return;
+                    console.log("Set folder: "+setDir)
+                    // start to download photoset
+                    photoset(s.id, setDir, size)
+                })
+
             })
         })
     })
@@ -113,15 +114,15 @@ function byPhotosets(path, size){
 
     request.get(sign(param), (err, resp, body) => {
         if (err) return;
-
         let sets = JSON.parse(body).photosets.photoset;
-        if (!fs.existsSync(path)) fs.mkdirSync(path);
 
         _.each(sets, s => {
-            let dir = `${path}/${s.title._content}`;
-            if (!fs.existsSync(dir)) fs.mkdirSync(dir);
-            console.log("Set folder: "+dir)
-            photoset(s.id, dir, size)
+            let setDir = `${path}/${s.title._content}`;
+            fs.mkdirs(setDir, err => {
+                if (err) return;
+                console.log("Set folder: "+setDir)
+                photoset(s.id, setDir, size)
+            })
         })
     })
 }
